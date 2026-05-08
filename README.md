@@ -6,7 +6,7 @@
 
 # 🌡️ Monitoramento Inteligente com IoT
 
-Link do Video: 
+Link do Video: https://youtu.be/X2d0vOaYHeE
 > Projeto de monitoramento de máquina/ambiente utilizando ESP32, sensores, protocolo MQTT, dashboard em tempo real com Node-RED e persistência em banco de dados MySQL na nuvem.
 
 ---
