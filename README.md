@@ -1,7 +1,8 @@
 # 👨‍💻 Integrantes
 
-RM561650 - Gustavo Sartori
-RM562267 - Gutemberg Rocha
+> RM561650 - Gustavo Sartori
+
+> RM562267 - Gutemberg Rocha
 
 # 🌡️ Monitoramento Inteligente com IoT
 
