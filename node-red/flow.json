@@ -1,0 +1,667 @@
+[
+    {
+        "id": "5e9be696e4a6f986",
+        "type": "tab",
+        "label": "IoT Monitoramento",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "569a2828277226fb",
+        "type": "mqtt in",
+        "z": "5e9be696e4a6f986",
+        "name": "MQTT Temperatura",
+        "topic": "maquina1/temperatura",
+        "qos": "0",
+        "datatype": "utf8",
+        "broker": "mqtt_broker_hivemq",
+        "inputs": 0,
+        "x": 120,
+        "y": 80,
+        "wires": [
+            [
+                "93e9f3cb3a0f241b"
+            ]
+        ]
+    },
+    {
+        "id": "93e9f3cb3a0f241b",
+        "type": "function",
+        "z": "5e9be696e4a6f986",
+        "name": "Parse Temperatura",
+        "func": "var valor = parseFloat(msg.payload);\nif (isNaN(valor)) return null;\nmsg.payload = valor;\nmsg.topic = 'temperatura';\nflow.set('temperatura', valor);\nreturn msg;",
+        "outputs": 1,
+        "x": 340,
+        "y": 80,
+        "wires": [
+            [
+                "374fdb5eedf1b174",
+                "5a16531d1c55f312",
+                "d2a12560d8da2d48",
+                "0caa7ccc86804390"
+            ]
+        ]
+    },
+    {
+        "id": "0caa7ccc86804390",
+        "type": "function",
+        "z": "5e9be696e4a6f986",
+        "name": "Salvar Temperatura",
+        "func": "var temp = msg.payload;\nmsg.topic = 'INSERT INTO leituras_temperatura (temperatura, criado_em) VALUES (' + temp + ', NOW())';\nreturn msg;",
+        "outputs": 1,
+        "x": 570,
+        "y": 160,
+        "wires": [
+            [
+                "c2c983301287d122"
+            ]
+        ]
+    },
+    {
+        "id": "c2c983301287d122",
+        "type": "mysql",
+        "z": "5e9be696e4a6f986",
+        "mydb": "mysql_config",
+        "name": "MySQL - leituras_temperatura",
+        "x": 800,
+        "y": 140,
+        "wires": [
+            [
+                "aae795c70863ebb6"
+            ]
+        ]
+    },
+    {
+        "id": "aae795c70863ebb6",
+        "type": "debug",
+        "z": "5e9be696e4a6f986",
+        "name": "Debug Temp MySQL",
+        "active": true,
+        "tosidebar": true,
+        "complete": "payload",
+        "x": 1040,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "374fdb5eedf1b174",
+        "type": "switch",
+        "z": "5e9be696e4a6f986",
+        "name": "Temp > 40C",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "40",
+                "vt": "num"
+            }
+        ],
+        "outputs": 1,
+        "x": 570,
+        "y": 20,
+        "wires": [
+            [
+                "657de37f3e208d39"
+            ]
+        ]
+    },
+    {
+        "id": "657de37f3e208d39",
+        "type": "change",
+        "z": "5e9be696e4a6f986",
+        "name": "Alerta Temp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "\"Temperatura elevada: \" & $string(msg.payload) & \" C\"",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 780,
+        "y": 40,
+        "wires": [
+            [
+                "b0491ee27b784db3"
+            ]
+        ]
+    },
+    {
+        "id": "5a16531d1c55f312",
+        "type": "ui_gauge",
+        "z": "5e9be696e4a6f986",
+        "name": "Gauge Temperatura",
+        "group": "group_sensores",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "gtype": "gage",
+        "title": "Temperatura (C)",
+        "label": "C",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "80",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "40",
+        "x": 580,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "d2a12560d8da2d48",
+        "type": "ui_chart",
+        "z": "5e9be696e4a6f986",
+        "name": "Grafico Temperatura",
+        "group": "group_graficos",
+        "order": 1,
+        "width": "12",
+        "height": "5",
+        "label": "Temperatura ao longo do tempo",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "Aguardando dados...",
+        "ymin": "-10",
+        "ymax": "80",
+        "removeOlder": 1,
+        "removeOlderPoints": "200",
+        "removeOlderUnit": "3600",
+        "colors": [
+            "#e8553a",
+            "#aec7e8"
+        ],
+        "outputs": 1,
+        "x": 580,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c50ec434172d58ca",
+        "type": "mqtt in",
+        "z": "5e9be696e4a6f986",
+        "name": "MQTT Distancia",
+        "topic": "maquina1/distancia",
+        "qos": "0",
+        "datatype": "utf8",
+        "broker": "mqtt_broker_hivemq",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 120,
+        "y": 260,
+        "wires": [
+            [
+                "8d2d6fbf39ecc2e6"
+            ]
+        ]
+    },
+    {
+        "id": "8d2d6fbf39ecc2e6",
+        "type": "function",
+        "z": "5e9be696e4a6f986",
+        "name": "Parse Distancia",
+        "func": "var valor = parseFloat(msg.payload);\nif (isNaN(valor) || valor < 0) return null;\nmsg.payload = valor;\nmsg.topic = 'distancia';\nflow.set('distancia', valor);\nreturn msg;",
+        "outputs": 1,
+        "x": 340,
+        "y": 260,
+        "wires": [
+            [
+                "9749684aea3317ca",
+                "2b74595f55e9447d",
+                "257e809dfa376655",
+                "f72000c0a8f2392b"
+            ]
+        ]
+    },
+    {
+        "id": "f72000c0a8f2392b",
+        "type": "function",
+        "z": "5e9be696e4a6f986",
+        "name": "Salvar Distancia",
+        "func": "var dist = msg.payload;\nmsg.topic = 'INSERT INTO leituras_distancia (distancia, criado_em) VALUES (' + dist + ', NOW())';\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 360,
+        "wires": [
+            [
+                "f3f1ea09efbff273"
+            ]
+        ]
+    },
+    {
+        "id": "f3f1ea09efbff273",
+        "type": "mysql",
+        "z": "5e9be696e4a6f986",
+        "mydb": "mysql_config",
+        "name": "MySQL - leituras_distancia",
+        "x": 820,
+        "y": 300,
+        "wires": [
+            [
+                "8a91972f49cab710"
+            ]
+        ]
+    },
+    {
+        "id": "8a91972f49cab710",
+        "type": "debug",
+        "z": "5e9be696e4a6f986",
+        "name": "Debug Dist MySQL",
+        "active": true,
+        "tosidebar": true,
+        "complete": "payload",
+        "x": 1040,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "9749684aea3317ca",
+        "type": "switch",
+        "z": "5e9be696e4a6f986",
+        "name": "Dist < 10cm",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lt",
+                "v": "10",
+                "vt": "num"
+            }
+        ],
+        "outputs": 1,
+        "x": 550,
+        "y": 200,
+        "wires": [
+            [
+                "daca292366828261"
+            ]
+        ]
+    },
+    {
+        "id": "daca292366828261",
+        "type": "change",
+        "z": "5e9be696e4a6f986",
+        "name": "Alerta Distancia",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "\"Objeto proximo! Distancia: \" & $string(msg.payload) & \" cm\"",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 780,
+        "y": 240,
+        "wires": [
+            [
+                "b0491ee27b784db3"
+            ]
+        ]
+    },
+    {
+        "id": "2b74595f55e9447d",
+        "type": "ui_gauge",
+        "z": "5e9be696e4a6f986",
+        "name": "Gauge Distancia",
+        "group": "group_sensores",
+        "order": 2,
+        "width": "6",
+        "height": "4",
+        "gtype": "gage",
+        "title": "Distancia (cm)",
+        "label": "cm",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "400",
+        "colors": [
+            "#ca3838",
+            "#e6e600",
+            "#00b500"
+        ],
+        "seg1": "10",
+        "seg2": "50",
+        "x": 560,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "257e809dfa376655",
+        "type": "ui_chart",
+        "z": "5e9be696e4a6f986",
+        "name": "Grafico Distancia",
+        "group": "group_graficos",
+        "order": 2,
+        "width": "12",
+        "height": "5",
+        "label": "Distancia ao longo do tempo",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "Aguardando dados...",
+        "ymin": "0",
+        "ymax": "400",
+        "removeOlder": 1,
+        "removeOlderPoints": "200",
+        "removeOlderUnit": "3600",
+        "colors": [
+            "#1f77b4",
+            "#aec7e8"
+        ],
+        "outputs": 1,
+        "x": 570,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d6ee22fa92d1884d",
+        "type": "inject",
+        "z": "5e9be696e4a6f986",
+        "name": "Buscar Clima (60s)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "60",
+        "once": true,
+        "onceDelay": "1",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 500,
+        "wires": [
+            [
+                "bc19972d1f11d26d"
+            ]
+        ]
+    },
+    {
+        "id": "bc19972d1f11d26d",
+        "type": "http request",
+        "z": "5e9be696e4a6f986",
+        "name": "API OpenWeather",
+        "method": "GET",
+        "ret": "obj",
+        "url": "https://api.openweathermap.org/data/2.5/weather?q=Sao%20Paulo&appid=08e841658c98f87d7fa35eea15f907a1&units=metric",
+        "x": 340,
+        "y": 500,
+        "wires": [
+            [
+                "70c977deb36cdcb2",
+                "555d5693f20eb81d"
+            ]
+        ]
+    },
+    {
+        "id": "70c977deb36cdcb2",
+        "type": "function",
+        "z": "5e9be696e4a6f986",
+        "name": "Extrair Dados Clima",
+        "func": "var d = msg.payload;\nvar msgs = [\n  { payload: d.main.temp, topic: 'temp_ext' },\n  { payload: d.main.humidity, topic: 'umidade' },\n  { payload: d.weather[0].description + ' | Vento: ' + d.wind.speed + ' m/s', topic: 'descricao' },\n  { payload: d.main.feels_like, topic: 'sensacao' }\n];\nreturn [msgs[0], msgs[1], msgs[2], msgs[3]];",
+        "outputs": 4,
+        "x": 570,
+        "y": 460,
+        "wires": [
+            [
+                "2f207f071b578090"
+            ],
+            [
+                "6b1690c0ed50dece"
+            ],
+            [
+                "8baf296772f91538"
+            ],
+            [
+                "0f15f857e74948a6"
+            ]
+        ]
+    },
+    {
+        "id": "555d5693f20eb81d",
+        "type": "function",
+        "z": "5e9be696e4a6f986",
+        "name": "Salvar Clima SP",
+        "func": "var d = msg.payload;\nvar temp  = d.main.temp;\nvar sens  = d.main.feels_like;\nvar umid  = d.main.humidity;\nvar desc  = d.weather[0].description.replace(/'/g, '');\nvar vento = d.wind.speed;\nmsg.topic = \"INSERT INTO clima_saopaulo (temperatura, sensacao, umidade, descricao, vento, criado_em) \" +\n            \"VALUES (\" + temp + \", \" + sens + \", \" + umid + \", '\" + desc + \"', \" + vento + \", NOW())\";\nreturn msg;",
+        "outputs": 1,
+        "x": 570,
+        "y": 540,
+        "wires": [
+            [
+                "aecfa38e43af6a9b"
+            ]
+        ]
+    },
+    {
+        "id": "aecfa38e43af6a9b",
+        "type": "mysql",
+        "z": "5e9be696e4a6f986",
+        "mydb": "mysql_config",
+        "name": "MySQL - clima_saopaulo",
+        "x": 790,
+        "y": 600,
+        "wires": [
+            [
+                "eb29ce1d2f3008e9"
+            ]
+        ]
+    },
+    {
+        "id": "eb29ce1d2f3008e9",
+        "type": "debug",
+        "z": "5e9be696e4a6f986",
+        "name": "Debug Clima MySQL",
+        "active": true,
+        "tosidebar": true,
+        "complete": "payload",
+        "x": 1040,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "2f207f071b578090",
+        "type": "ui_gauge",
+        "z": "5e9be696e4a6f986",
+        "name": "Temp Externa SP",
+        "group": "group_clima",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "gtype": "gage",
+        "title": "Temp. Externa SP (C)",
+        "label": "C",
+        "format": "{{value}}",
+        "min": "-5",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "15",
+        "seg2": "30",
+        "x": 800,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "6b1690c0ed50dece",
+        "type": "ui_gauge",
+        "z": "5e9be696e4a6f986",
+        "name": "Gauge Umidade",
+        "group": "group_clima",
+        "order": 2,
+        "width": "6",
+        "height": "4",
+        "gtype": "gage",
+        "title": "Umidade Relativa (%)",
+        "label": "%",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#ca3838",
+            "#e6e600",
+            "#00b500"
+        ],
+        "seg1": "30",
+        "seg2": "60",
+        "x": 800,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "8baf296772f91538",
+        "type": "ui_text",
+        "z": "5e9be696e4a6f986",
+        "group": "group_clima",
+        "order": 3,
+        "width": "12",
+        "height": "1",
+        "name": "Descricao Clima",
+        "label": "Condicao: ",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 800,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "0f15f857e74948a6",
+        "type": "ui_text",
+        "z": "5e9be696e4a6f986",
+        "group": "group_clima",
+        "order": 4,
+        "width": "6",
+        "height": "1",
+        "name": "Sensacao Termica",
+        "label": "Sensacao: ",
+        "format": "{{msg.payload}} C",
+        "layout": "row-spread",
+        "x": 800,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "b0491ee27b784db3",
+        "type": "ui_toast",
+        "z": "5e9be696e4a6f986",
+        "position": "top right",
+        "displayTime": "5",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "name": "Notificacao Alerta",
+        "x": 1050,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "mqtt_broker_hivemq",
+        "type": "mqtt-broker",
+        "name": "HiveMQ Cloud",
+        "broker": "3f3a91da234e4351bfbad9f9e86a145c.s1.eu.hivemq.cloud",
+        "port": "8883",
+        "tls": true,
+        "clientid": "nodered_client",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "mysql_config",
+        "type": "MySQLdatabase",
+        "name": "Clever Cloud MySQL",
+        "host": "bxtupvdxfjdabxfarhib-mysql.services.clever-cloud.com",
+        "port": "3306",
+        "db": "bxtupvdxfjdabxfarhib",
+        "tz": "",
+        "charset": ""
+    },
+    {
+        "id": "group_sensores",
+        "type": "ui_group",
+        "name": "Sensores ESP32",
+        "tab": "ui_tab_dashboard",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "group_graficos",
+        "type": "ui_group",
+        "name": "Historico de Leituras",
+        "tab": "ui_tab_dashboard",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "group_clima",
+        "type": "ui_group",
+        "name": "Clima Externo - Sao Paulo",
+        "tab": "ui_tab_dashboard",
+        "order": 3,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ui_tab_dashboard",
+        "type": "ui_tab",
+        "name": "Dashboard IoT",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "ba6f24f3c6e80c2a",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-node-mysql": "3.0.0",
+            "node-red-dashboard": "3.6.6"
+        }
+    }
+]
