@@ -1,11 +1,11 @@
 # 👨‍💻 Integrantes
 
-> RM561650 - Gustavo Sartori
-> RM562267 - Gutemberg Rocha
+>> RM561650 - Gustavo Sartori
+>>  RM562267 - Gutemberg Rocha
 
 # 🌡️ Monitoramento Inteligente com IoT
 
-> Link do Youtube: 
+Link do Youtube: 
 > Projeto de monitoramento de máquina/ambiente utilizando ESP32, sensores, protocolo MQTT, dashboard em tempo real com Node-RED e persistência em banco de dados MySQL na nuvem.
 
 ---
